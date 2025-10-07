@@ -95,10 +95,44 @@ function Install-Ubuntu {
     }
     
     Write-Info "Installing Ubuntu..."
-    wsl --install -d Ubuntu-22.04
+    
+    # Try the standard install first
+    $installResult = wsl --install -d Ubuntu 2>&1
+    
+    # Check if it failed with certificate error
+    if ($LASTEXITCODE -ne 0 -and $installResult -match "certificate|0x80072f06") {
+        Write-Warn "Standard installation failed. Trying alternative method..."
+        
+        # Download Ubuntu appx directly
+        $ubuntuUrl = "https://aka.ms/wslubuntu2204"
+        $appxPath = Join-Path $env:TEMP "Ubuntu.appx"
+        
+        try {
+            Write-Info "Downloading Ubuntu 22.04..."
+            # Use TLS 1.2
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri $ubuntuUrl -OutFile $appxPath -UseBasicParsing
+            
+            Write-Info "Installing Ubuntu from downloaded package..."
+            Add-AppxPackage -Path $appxPath
+            
+            Remove-Item $appxPath -Force -ErrorAction SilentlyContinue
+            Write-Success "Ubuntu installed via alternative method"
+        } catch {
+            Write-Err "Failed to install Ubuntu: $_"
+            Write-Info "Please install Ubuntu manually from the Microsoft Store"
+            Write-Info "Or download from: https://aka.ms/wslubuntu2204"
+            return
+        }
+    }
+    
     Write-Info "`nPlease complete Ubuntu setup (create username and password) in the window that opens."
     Write-Info "After setup is complete, close the Ubuntu window and press Enter here to continue..."
-    Read-Host
+    
+    # Launch Ubuntu for first-time setup
+    Start-Process "ubuntu2204.exe" -Wait
+    
+    Read-Host "Press Enter after completing Ubuntu setup"
     Write-Success "Ubuntu installation completed"
 }
 
@@ -179,16 +213,30 @@ function Install-VSCodeExtensions {
         "ms-vscode.cpptools"
         "ms-vscode.cpptools-extension-pack"
         "ms-python.python"
-        "yoctoproject.yocto-bitbake"
         "toradex.toradex-torizon-toolkit"
     )
     
+    $failed = @()
     foreach ($ext in $extensions) {
         Write-Info "Installing extension: $ext"
-        & $codePath --install-extension $ext --force 2>&1 | Out-Null
+        try {
+            $result = & $codePath --install-extension $ext --force 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                $failed += $ext
+                Write-Warn "Failed to install: $ext"
+            }
+        } catch {
+            $failed += $ext
+            Write-Warn "Failed to install: $ext"
+        }
     }
     
-    Write-Success "VS Code extensions installed"
+    if ($failed.Count -gt 0) {
+        Write-Warn "Some extensions failed to install: $($failed -join ', ')"
+        Write-Info "You can install these manually later from VS Code"
+    }
+    
+    Write-Success "VS Code extensions installation completed"
 }
 
 # Configure WSL for Toradex development
