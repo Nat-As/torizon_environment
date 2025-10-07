@@ -237,7 +237,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Disclaimer
 
-This is an unofficial setup script. For official Toradex documentation and support, please visit the [Toradex Developer Center](https://developer.toradex.com/).
+This is an unofficial setup script. For official Toradex documentation and support, please visit the [Toradex Developer Center](https://developer.toradex.com/torizon/application-development/ide-extension/).
 
 ## Acknowledgments
 
