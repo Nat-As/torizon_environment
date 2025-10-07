@@ -161,6 +161,14 @@ cd torizon_environment
    - Start Docker Desktop
    - Launch VS Code
    - Use `Ctrl+Shift+P` and select "WSL: Connect to WSL"
+  
+> [!WARNING]
+> Even though you are on Windows, all files and folders must be accessed via WSL 2.
+
+> [!TIP]
+> Always create projects using the WSL 2 file system `/home/youruser/`\
+> You can access the WSL 2 file system using the command `explorer.exe .`\
+> Always make sure you are accessing the project folder with WSL connected.
 
 ## Example Output
 ![screenshot](/src/installer.png)
