@@ -149,6 +149,7 @@ cd torizon_environment
    ```
    
    The script will guide you through the installation process.
+> Note: If you receive an error that the .ps1 file is not digitally signed, you may need to right-click on the script file, select Properties, and check the "Unblock" box at the bottom, then click Apply.
 
 5. **Restart Your Computer**
    
