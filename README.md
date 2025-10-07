@@ -160,6 +160,8 @@ cd torizon_environment
    - Launch VS Code
    - Use `Ctrl+Shift+P` and select "WSL: Connect to WSL"
 
+## Example Output
+![screenshot](/src/installer.png)
 ## Post-Installation
 
 ### Verify Installation
